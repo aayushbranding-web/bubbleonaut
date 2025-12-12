@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bubbleonaut ~AyTech Solution</title>
-	
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
 
@@ -13,7 +13,7 @@
             background-color: #000;
             overflow: hidden;
             touch-action: none;
-            font-family: 'Fredoka One', cursive; /* Cute, bubbly font */
+            font-family: 'Fredoka One', cursive;
             user-select: none;
             -webkit-user-select: none;
         }
@@ -35,14 +35,15 @@
 
         .hud-text {
             color: #fff; font-size: 20px;
-            text-shadow: 2px 2px 0px #00aaff; /* Bubble Shadow outline */
+            text-shadow: 2px 2px 0px #00aaff;
             background: rgba(255, 255, 255, 0.1);
             padding: 8px 15px; border-radius: 20px;
             border: 3px solid rgba(0, 170, 255, 0.5);
         }
 
         #controls {
-            position: absolute; bottom: 30px; width: 100%; height: 120px;
+            position: absolute; bottom: 60px; /* Moved up slightly for footer space */
+            width: 100%; height: 120px;
             display: flex; justify-content: space-between; padding: 0 30px;
             box-sizing: border-box; z-index: 20; display: none;
         }
@@ -58,13 +59,14 @@
             box-shadow: inset 0 0 15px rgba(0,200,255,0.3);
             backdrop-filter: blur(5px);
             display: flex; justify-content: center; align-items: center;
-            color: #fff; font-size: 30px; touch-action: none;
+            color: #fff; font-size: 30px; touch-action: none; pointer-events: auto;
         }
 
         .btn:active { transform: scale(0.9); background: rgba(0, 255, 255, 0.3); }
-        .btn-fire { border-color: rgba(255, 100, 150, 0.5); background: radial-gradient(circle at 30% 30%, rgba
-
-(255,200,200,0.4), rgba(255,0,100,0.1)); }
+        .btn-fire { 
+            border-color: rgba(255, 100, 150, 0.5); 
+            background: radial-gradient(circle at 30% 30%, rgba(255,200,200,0.4), rgba(255,0,100,0.1)); 
+        }
 
         /* --- START SCREEN --- */
         #overlay {
@@ -85,39 +87,19 @@
 
         @media (max-width: 768px) { #controls { display: flex; } h1 { font-size: 35px; } }
 
-	/* --- NEW FOOTER STYLES --- */
+        /* --- FOOTER STYLES --- */
         #game-footer {
-            position: fixed; /* Screen ke bottom par fix karne ke liye */
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            /* Dark background taaki text saaf dikhe */
-            background-color: rgba(20, 20, 30, 0.9);
-            color: #ccc; /* Light grey text */
-            padding: 8px 0; /* Thodi spacing */
-            display: flex;
-            justify-content: center; /* Center align */
-            align-items: center; /* Vertical center */
-            font-family: sans-serif; /* Simple font readable ke liye */
-            font-size: 12px;
-            z-index: 1000; /* Sabse upar dikhane ke liye */
-            border-top: 2px solid #00aaff; /* Neon border upar */
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            background-color: rgba(20, 20, 30, 0.95);
+            color: #ccc;
+            padding: 8px 0;
+            display: flex; justify-content: center; align-items: center;
+            font-family: sans-serif; font-size: 12px;
+            z-index: 1000;
+            border-top: 2px solid #00aaff;
         }
-
-        .footer-content {
-            display: flex;
-            align-items: center;
-        }
-
-        .footer-logo {
-            height: 50px; /* Logo ki height fix karein */
-            width: 50px;
-            margin-right: 11px; /* Logo aur text ke beech gap */
-            /* YAHAN HAI TRANSPARENCY HATANE KA JADU: */
-            background-color: #ffffff; /* Solid white background image ke peeche */
-            padding: 2px; /* Thoda white border */
-            border-radius: 4px; /* Rounded corners */
-        }
+        .footer-content { display: flex; align-items: center; }
     </style>
 </head>
 <body>
@@ -130,30 +112,39 @@
     </div>
     <div id="controls">
         <div class="d-pad">
-            <div class="btn" id="btn-left">?</div>
-            <div class="btn" id="btn-right">?</div>
+            <div class="btn" id="btn-left">←</div>
+            <div class="btn" id="btn-right">→</div>
         </div>
         <div class="action-pad">
-            <div class="btn" id="btn-thrust">??</div>
-            <div class="btn btn-fire" id="btn-shoot">??</div>
+            <div class="btn" id="btn-thrust">↑</div>
+            <div class="btn btn-fire" id="btn-shoot">◎</div>
         </div>
     </div>
     <div id="overlay">
         <h1 id="title-text"> BUBBLEONAUT<br>
-    	<span style="font-size: 24px; color: #fff; display: block; margin-top: 5px;">~AyTech Solution</span>
-	</h1>
-        <p style="color:#aaa; font-family: sans-serif;">Pop the space rocks!</p>
+            <span style="font-size: 24px; color: #fff; display: block; margin-top: 5px;">~AyTech Solution</span>
+        </h1>
+        <p style="color:#aaa; font-family: sans-serif;">Arrow Keys/WASD to Move • Space to Shoot</p>
         <button class="start-btn" id="start-btn">PLAY!</button>
     </div>
 </div>
 
+<div id="game-footer">
+    <div class="footer-content">
+        <span>Made by <strong>AyTech Solution</strong> | 2025 Copyright. All rights reserved.</span>
+    </div>
+</div>
+
 <script>
-    // --- AUDIO ENGINE (Bubbly Sounds) ---
+    // --- AUDIO ENGINE ---
     const AudioEngine = {
         ctx: null,
-        init: function() { if (!this.ctx) { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); 
-
-this.ctx.resume(); } },
+        init: function() { 
+            if (!this.ctx) { 
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)(); 
+                this.ctx.resume(); 
+            } 
+        },
         play: function(type) {
             if (!this.ctx) return;
             const t = this.ctx.currentTime;
@@ -162,26 +153,23 @@ this.ctx.resume(); } },
             osc.connect(gain); gain.connect(this.ctx.destination);
 
             if (type === 'shoot') {
-                // BUBBLE "BLOOP" SOUND (Sine wave sweep up)
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(300, t);
                 osc.frequency.exponentialRampToValueAtTime(800, t + 0.1);
-                gain.gain.setValueAtTime(0.9, t);
+                gain.gain.setValueAtTime(0.5, t);
                 gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
                 osc.start(t); osc.stop(t + 0.15);
             } else if (type === 'thrust') {
-                // Soft thrust hiss
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(100, t);
-                gain.gain.setValueAtTime(0.5, t);
+                gain.gain.setValueAtTime(0.3, t);
                 gain.gain.linearRampToValueAtTime(0, t + 0.1);
                 osc.start(t); osc.stop(t + 0.1);
             } else if (type === 'explode') {
-                // Bubble POP sound
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(150, t);
                 osc.frequency.exponentialRampToValueAtTime(20, t + 0.2);
-                gain.gain.setValueAtTime(1.0, t);
+                gain.gain.setValueAtTime(0.8, t);
                 gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
                 osc.start(t); osc.stop(t + 0.2);
             }
@@ -200,147 +188,206 @@ this.ctx.resume(); } },
     const startBtn = document.getElementById('start-btn');
     const titleText = document.getElementById('title-text');
 
-    const FPS = 60; const SHIP_SIZE = 20; const TURN_SPEED = 250; const THRUST = 12; const FRICTION = 0.94;
+    const FPS = 60; const SHIP_SIZE = 20; const TURN_SPEED = 250; const THRUST = 15; const FRICTION = 0.96;
     let gameRunning = false; let score = 0; let lives = 3; let level = 1;
     const ship = { x:0, y:0, a:0, xv:0, yv:0, dead:false, blink:0, cd:0 };
     let asteroids = []; let lasers = []; let particles = [];
     const input = { up: false, left: false, right: false, shoot: false };
 
     // --- INPUTS ---
-    const setKey = (k, s) => { if('ArrowUp'===k||'w'===k)input.up=s; if('ArrowLeft'===k||'a'===k)input.left=s; if
+    const setKey = (k, s) => { 
+        if('ArrowUp'===k||'w'===k||'W'===k) input.up=s; 
+        if('ArrowLeft'===k||'a'===k||'A'===k) input.left=s; 
+        if('ArrowRight'===k||'d'===k||'D'===k) input.right=s; 
+        if('Space'===k||'Enter'===k||' '===k) input.shoot=s; 
+    };
+    window.addEventListener('keydown', e => setKey(e.key, true)); 
+    window.addEventListener('keyup', e => setKey(e.key, false));
 
-('ArrowRight'===k||'d'===k)input.right=s; if('Space'===k||'Enter'===k)input.shoot=s; };
-    window.addEventListener('keydown', e => setKey(e.code, true)); window.addEventListener('keyup', e => setKey(e.code, 
-
-false));
-    const bindTouch = (id, prop) => { const btn=document.getElementById(id); const s=(e)=>{e.preventDefault();input[prop]
-
-=true;}; const n=(e)=>{e.preventDefault();input[prop]=false;}; btn.addEventListener('touchstart',s); btn.addEventListener
-
-('touchend',n); btn.addEventListener('mousedown',s); btn.addEventListener('mouseup',n); };
-    bindTouch('btn-left','left'); bindTouch('btn-right','right'); bindTouch('btn-thrust','up'); bindTouch('btn-
-
-shoot','shoot');
+    const bindTouch = (id, prop) => { 
+        const btn=document.getElementById(id); 
+        const s=(e)=>{e.preventDefault(); input[prop]=true;}; 
+        const n=(e)=>{e.preventDefault(); input[prop]=false;}; 
+        btn.addEventListener('touchstart',s, {passive: false}); 
+        btn.addEventListener('touchend',n); 
+        btn.addEventListener('mousedown',s); 
+        btn.addEventListener('mouseup',n); 
+    };
+    bindTouch('btn-left','left'); bindTouch('btn-right','right'); bindTouch('btn-thrust','up'); bindTouch('btn-shoot','shoot');
 
     // --- GAME LOOP ---
     startBtn.addEventListener('click', () => { AudioEngine.init(); initGame(); });
-    function initGame() { overlay.style.display='none'; gameRunning=true; score=0; lives=3; level=1; 
 
-scoreEl.innerText="SCORE: 0"; livesEl.innerText="LIVES: 3"; resetLevel(); loop(); }
-    function resetLevel() { ship.x=canvas.width/2; ship.y=canvas.height/2; ship.xv=0; ship.yv=0; ship.a=-Math.PI/2; 
+    function initGame() { 
+        overlay.style.display='none'; gameRunning=true; score=0; lives=3; level=1; 
+        scoreEl.innerText="SCORE: 0"; livesEl.innerText="LIVES: 3"; resetLevel(); loop(); 
+    }
 
-ship.dead=false; ship.blink=120; asteroids=[]; lasers=[]; particles=[];
+    function resetLevel() { 
+        ship.x=canvas.width/2; ship.y=canvas.height/2; ship.xv=0; ship.yv=0; ship.a=-Math.PI/2; 
+        ship.dead=false; ship.blink=120; asteroids=[]; lasers=[]; particles=[];
         for(let i=0; i<2+level; i++) {
-            let x, y, d; do { x=Math.random()*canvas.width; y=Math.random()*canvas.height; d=Math.hypot(x-ship.x, y-
-
-ship.y); } while(d<250);
-            asteroids.push({ x, y, xv:(Math.random()-0.5)*(3+level), yv:(Math.random()-0.5)*(3+level), r:45+Math.random()
-
-*20, rot: Math.random()*Math.PI, rSpd: (Math.random()-0.5)*0.05 });
+            let x, y, d; 
+            do { x=Math.random()*canvas.width; y=Math.random()*canvas.height; d=Math.hypot(x-ship.x, y-ship.y); } while(d<250);
+            asteroids.push({ 
+                x, y, xv:(Math.random()-0.5)*(3+level), yv:(Math.random()-0.5)*(3+level), 
+                r:45+Math.random()*20, rot: Math.random()*Math.PI, rSpd: (Math.random()-0.5)*0.05 
+            });
         }
     }
 
     function update() {
         if(!gameRunning) return;
-        // Ship
+        
+        // Ship Logic
         if(!ship.dead) {
-            if(input.left) ship.a -= (TURN_SPEED*Math.PI/180)/FPS; if(input.right) ship.a += (TURN_SPEED*Math.PI/180)/FPS;
-            if(input.up) { ship.xv+=THRUST*Math.cos(ship.a)/FPS; ship.yv+=THRUST*Math.sin(ship.a)/FPS; if(Math.random()
-
-<0.2) AudioEngine.play('thrust');
-                for(let i=0;i<2;i++) particles.push({x:ship.x-Math.cos(ship.a)*15, y:ship.y-Math.sin(ship.a)*15, xv:
-
-(Math.random()-0.5)*3, yv:(Math.random()-0.5)*3, life:15, color:'rgba(100,200,255,0.5)', type:'bubble'});
-            } else { ship.xv*=FRICTION; ship.yv*=FRICTION; }
-            ship.x+=ship.xv; ship.y+=ship.yv;
-            if(ship.cd>0) ship.cd--;
-            if(input.shoot && ship.cd<=0) { lasers.push({x:ship.x+Math.cos(ship.a)*25, y:ship.y+Math.sin(ship.a)*25, 
-
-xv:Math.cos(ship.a)*500, yv:Math.sin(ship.a)*500, life:90, r: 12}); AudioEngine.play('shoot'); ship.cd=15; }
-        }
-        wrap(ship, SHIP_SIZE);
-        // Bubbles (Lasers)
-        for(let i=lasers.length-1; i>=0; i--) { lasers[i].x+=lasers[i].xv/FPS; lasers[i].y+=lasers[i].yv/FPS; lasers
-
-[i].life--; wrap(lasers[i], 0); if(lasers[i].life<=0) lasers.splice(i,1); }
-        // Asteroids
-        if(asteroids.length===0) { level++; resetLevel(); }
-        for(let i=asteroids.length-1; i>=0; i--) { let a=asteroids[i]; a.x+=a.xv; a.y+=a.yv; a.rot+=a.rSpd; wrap(a, a.r);
-            for(let j=lasers.length-1; j>=0; j--) { let l=lasers[j]; if(Math.hypot(a.x-l.x, a.y-l.y) < a.r+l.r) {
-                    AudioEngine.play('explode'); lasers.splice(j,1); asteroids.splice(i,1);
-                    for(let p=0; p<15; p++) particles.push({x:a.x, y:a.y, xv:(Math.random()-0.5)*8, yv:(Math.random()-
-
-0.5)*8, life:30, color:'rgba(255,100,200,0.8)', type:'pop'});
-                    score+=100; scoreEl.innerText="SCORE: "+score;
-                    if(a.r>30) { asteroids.push({x:a.x,y:a.y,xv:Math.random()*4-2,yv:Math.random()*4-2,r:a.r/1.8, rot:0, 
-
-rSpd:a.rSpd*1.5}); asteroids.push({x:a.x,y:a.y,xv:Math.random()*4-2,yv:Math.random()*4-2,r:a.r/1.8, rot:0, rSpd:-
-
-a.rSpd*1.5}); }
-                    break;
-            }}
-            if(!ship.dead && ship.blink<=0 && Math.hypot(a.x-ship.x, a.y-ship.y)<a.r+SHIP_SIZE-5) {
-                AudioEngine.play('explode'); ship.dead=true; lives--; livesEl.innerText="LIVES: "+lives;
-                for(let p=0; p<30; p++) particles.push({x:ship.x, y:ship.y, xv:(Math.random()-0.5)*10, yv:(Math.random()-
-
-0.5)*10, life:50, color:'#fff', type:'pop'});
-                if(lives>0) setTimeout(()=>
-
-{ship.dead=false;ship.x=canvas.width/2;ship.y=canvas.height/2;ship.xv=0;ship.yv=0;ship.blink=150;},1500);
-                else setTimeout(()=>{gameRunning=false;titleText.innerText="GAME 
-
-OVER";startBtn.innerText="RETRY";overlay.style.display='flex';},1500);
+            if(input.left) ship.a -= (TURN_SPEED*Math.PI/180)/FPS; 
+            if(input.right) ship.a += (TURN_SPEED*Math.PI/180)/FPS;
+            
+            if(input.up) { 
+                ship.xv += THRUST*Math.cos(ship.a)/FPS; 
+                ship.yv += THRUST*Math.sin(ship.a)/FPS; 
+                if(Math.random()<0.2) AudioEngine.play('thrust');
+                
+                // Thrust Bubbles
+                for(let i=0;i<2;i++) particles.push({
+                    x:ship.x-Math.cos(ship.a)*15, y:ship.y-Math.sin(ship.a)*15, 
+                    xv:(Math.random()-0.5)*3, yv:(Math.random()-0.5)*3, 
+                    life:15, color:'rgba(100,200,255,0.5)', type:'bubble'
+                });
+            } else { 
+                ship.xv *= FRICTION; ship.yv *= FRICTION; 
+            }
+            
+            ship.x += ship.xv; ship.y += ship.yv;
+            if(ship.cd > 0) ship.cd--;
+            
+            if(input.shoot && ship.cd <= 0) { 
+                lasers.push({
+                    x:ship.x+Math.cos(ship.a)*25, y:ship.y+Math.sin(ship.a)*25, 
+                    xv:Math.cos(ship.a)*500, yv:Math.sin(ship.a)*500, life:90, r: 12
+                }); 
+                AudioEngine.play('shoot'); ship.cd = 15; 
             }
         }
-        // Particles
-        for(let i=particles.length-1; i>=0; i--) { particles[i].x+=particles[i].xv; particles[i].y+=particles[i].yv; 
+        wrap(ship, SHIP_SIZE);
 
-particles[i].life--; if(particles[i].life<=0) particles.splice(i,1); }
+        // Lasers Logic
+        for(let i=lasers.length-1; i>=0; i--) { 
+            lasers[i].x += lasers[i].xv/FPS; lasers[i].y += lasers[i].yv/FPS; 
+            lasers[i].life--; wrap(lasers[i], 0); 
+            if(lasers[i].life<=0) lasers.splice(i,1); 
+        }
+
+        // Asteroids Logic
+        if(asteroids.length===0) { level++; resetLevel(); }
+        
+        for(let i=asteroids.length-1; i>=0; i--) { 
+            let a = asteroids[i]; 
+            a.x += a.xv; a.y += a.yv; a.rot += a.rSpd; 
+            wrap(a, a.r);
+
+            // Collision: Laser vs Asteroid
+            for(let j=lasers.length-1; j>=0; j--) { 
+                let l = lasers[j]; 
+                if(Math.hypot(a.x-l.x, a.y-l.y) < a.r+l.r) {
+                    AudioEngine.play('explode'); 
+                    lasers.splice(j,1); asteroids.splice(i,1);
+                    
+                    // Explosion particles
+                    for(let p=0; p<15; p++) particles.push({
+                        x:a.x, y:a.y, xv:(Math.random()-0.5)*8, yv:(Math.random()-0.5)*8, 
+                        life:30, color:'rgba(255,100,200,0.8)', type:'pop'
+                    });
+                    
+                    score += 100; scoreEl.innerText="SCORE: "+score;
+                    
+                    // Split Asteroid
+                    if(a.r > 30) { 
+                        asteroids.push({x:a.x,y:a.y,xv:Math.random()*4-2,yv:Math.random()*4-2,r:a.r/1.8, rot:0, rSpd:a.rSpd*1.5}); 
+                        asteroids.push({x:a.x,y:a.y,xv:Math.random()*4-2,yv:Math.random()*4-2,r:a.r/1.8, rot:0, rSpd:-a.rSpd*1.5}); 
+                    }
+                    break;
+                }
+            }
+
+            // Collision: Ship vs Asteroid
+            if(!ship.dead && ship.blink<=0 && asteroids[i]) {
+                if(Math.hypot(a.x-ship.x, a.y-ship.y) < a.r+SHIP_SIZE-5) {
+                    AudioEngine.play('explode'); ship.dead=true; lives--; livesEl.innerText="LIVES: "+lives;
+                    
+                    for(let p=0; p<30; p++) particles.push({
+                        x:ship.x, y:ship.y, xv:(Math.random()-0.5)*10, yv:(Math.random()-0.5)*10, 
+                        life:50, color:'#fff', type:'pop'
+                    });
+
+                    if(lives > 0) {
+                        setTimeout(()=> {
+                            ship.dead=false; ship.x=canvas.width/2; ship.y=canvas.height/2; 
+                            ship.xv=0; ship.yv=0; ship.blink=150;
+                        }, 1500);
+                    } else {
+                        setTimeout(()=> {
+                            gameRunning=false; titleText.innerText="GAME OVER"; 
+                            startBtn.innerText="RETRY"; overlay.style.display='flex';
+                        }, 1500);
+                    }
+                }
+            }
+        }
+
+        // Particles Logic
+        for(let i=particles.length-1; i>=0; i--) { 
+            particles[i].x += particles[i].xv; particles[i].y += particles[i].yv; 
+            particles[i].life--; 
+            if(particles[i].life<=0) particles.splice(i,1); 
+        }
+        
         if(ship.blink>0) ship.blink--;
     }
-    const wrap=(o,p)=>{if(o.x<-p)o.x=canvas.width+p;if(o.x>canvas.width+p)o.x=-p;if(o.y<-p)o.y=canvas.height+p;if
 
-(o.y>canvas.height+p)o.y=-p;};
+    const wrap = (o,p) => {
+        if(o.x < -p) o.x = canvas.width + p;
+        if(o.x > canvas.width + p) o.x = -p;
+        if(o.y < -p) o.y = canvas.height + p;
+        if(o.y > canvas.height + p) o.y = -p;
+    };
 
-    // --- DRAWING (The Attractive Part) ---
+    // --- DRAWING ---
     function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear with transparent so background shows
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // DRAW BUBBLES (Lasers)
+        // Draw Lasers
         lasers.forEach(l => {
             drawBubble(l.x, l.y, l.r, 'rgba(0,200,255,0.6)', 'rgba(200,255,255,0.8)');
         });
 
-        // DRAW PLAYER (Astronaut)
+        // Draw Player
         if(!ship.dead && Math.floor(ship.blink/10)%2===0) {
-            ctx.save(); ctx.translate(ship.x, ship.y); ctx.rotate(ship.a + Math.PI/2); // Adjust for sprite facing up
-            // Body/Backpack
+            ctx.save(); ctx.translate(ship.x, ship.y); ctx.rotate(ship.a + Math.PI/2); 
             ctx.fillStyle = '#eee'; ctx.fillRect(-12, -10, 24, 22); 
-            ctx.fillStyle = '#ccc'; ctx.fillRect(-14, -8, 4, 18); ctx.fillRect(10, -8, 4, 18); // Tanks
-            // Helmet (Visor)
+            ctx.fillStyle = '#ccc'; ctx.fillRect(-14, -8, 4, 18); ctx.fillRect(10, -8, 4, 18); 
             ctx.fillStyle = '#00aaff'; ctx.beginPath(); ctx.arc(0, -10, 10, 0, Math.PI*2); ctx.fill();
-             // Helmet Reflection
             ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.beginPath(); ctx.arc(-4, -14, 3, 0, Math.PI*2); ctx.fill();
-            // Bubble Gun
             ctx.fillStyle = '#ff66aa'; ctx.fillRect(12, -2, 12, 8); 
             ctx.restore();
         }
 
-        // DRAW ASTEROIDS (Rocks inside Bubbles)
+        // Draw Asteroids
         asteroids.forEach(a => {
             ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(a.rot);
-            // The Rock inside
             ctx.fillStyle = '#776688'; ctx.beginPath();
-            for(let i=0; i<6; i++) { let angle=(i/6)*Math.PI*2; let r=a.r*(0.6 + 0.2*Math.cos(i*2)); ctx.lineTo
-
-(r*Math.cos(angle), r*Math.sin(angle)); }
+            for(let i=0; i<6; i++) { 
+                let angle=(i/6)*Math.PI*2; 
+                let r=a.r*(0.6 + 0.2*Math.cos(i*2)); 
+                ctx.lineTo(r*Math.cos(angle), r*Math.sin(angle)); 
+            }
             ctx.fill();
-            // The Pink outer bubble container
             drawBubble(0,0, a.r, 'rgba(255,100,200,0.3)', 'rgba(255,200,220,0.6)');
             ctx.restore();
         });
 
-        // DRAW PARTICLES
+        // Draw Particles
         particles.forEach(p => {
             ctx.globalAlpha = p.life/50;
             if(p.type === 'bubble') drawBubble(p.x, p.y, 5, p.color, '#fff');
@@ -349,26 +396,14 @@ particles[i].life--; if(particles[i].life<=0) particles.splice(i,1); }
         });
     }
 
-    // Helper to draw shiny bubbles
     function drawBubble(x, y, r, mainColor, shineColor) {
         ctx.fillStyle = mainColor; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
-        // Rim shine
-        ctx.strokeStyle = shineColor; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x, y, r-1, -Math.PI/4, Math.PI); 
-
-ctx.stroke();
-        // Shine spot
+        ctx.strokeStyle = shineColor; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x, y, r-1, -Math.PI/4, Math.PI); ctx.stroke();
         ctx.fillStyle = shineColor; ctx.beginPath(); ctx.arc(x - r*0.3, y - r*0.3, r*0.25, 0, Math.PI*2); ctx.fill();
     }
 
     function loop() { update(); draw(); requestAnimationFrame(loop); }
 </script>
-
-	<div id="game-footer">
-    <div class="footer-content">
-        
-        <span>Made by <strong>AyTech Solution</strong> | 2025 Copyright. All rights reserved.</span>
-    </div>
-</div>
 
 </body>
 </html>
